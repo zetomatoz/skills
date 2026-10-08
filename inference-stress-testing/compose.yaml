@@ -1,3 +1,21 @@
+x-runtime-environment: &runtime-environment
+  BENCH_TARGET: ${BENCH_TARGET:-}
+  ENDPOINT_PROXY: ${ENDPOINT_PROXY:-}
+  PROXY_API_KEY: ${PROXY_API_KEY:-}
+  ENDPOINT_INFERENCE_BACKEND: ${ENDPOINT_INFERENCE_BACKEND:-}
+  INFERENCE_BACKEND_API_KEY: ${INFERENCE_BACKEND_API_KEY:-}
+  ENDPOINT_CONTROL_PLANE: ${ENDPOINT_CONTROL_PLANE:-}
+  CONTROL_PLANE_API_KEY: ${CONTROL_PLANE_API_KEY:-}
+  ENDPOINT_OPENAI: ${ENDPOINT_OPENAI:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  HF_TOKEN: ${HF_TOKEN:-}
+  CERT_FILE: ${CERT_FILE:-}
+  AI_ENDPOINT: ${AI_ENDPOINT:-}
+  AI_MODEL: ${AI_MODEL:-}
+  AI_API_KEY: ${AI_API_KEY:-}
+  RAY_DASHBOARD_URL: ${RAY_DASHBOARD_URL:-}
+  RAY_AUTH_TOKEN: ${RAY_AUTH_TOKEN:-}
+
 services:
   runner:
     image: ${GUIDELLM_IMAGE:-ghcr.io/vllm-project/guidellm:v0.8.0}
@@ -9,6 +27,7 @@ services:
     volumes:
       - .:/work
     environment:
+      <<: *runtime-environment
       HF_HOME: /work/.cache/huggingface
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -22,6 +41,7 @@ services:
     working_dir: /work
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     env_file: .env
+    environment: *runtime-environment
     volumes:
       - .:/work
   ray:
@@ -31,6 +51,7 @@ services:
     working_dir: /work
     user: "${LOCAL_UID:-1000}:${LOCAL_GID:-1000}"
     env_file: .env
+    environment: *runtime-environment
     volumes:
       - .:/work
     extra_hosts:

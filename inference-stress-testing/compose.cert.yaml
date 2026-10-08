@@ -1,0 +1,28 @@
+# Use with: docker compose -f compose.yaml -f compose.cert.yaml ...
+# CERT_FILE is a host path here; processes inside the container receive the mount path.
+x-certificate-environment: &certificate-environment
+  CERT_FILE: /certificates/ca.pem
+  SSL_CERT_FILE: /certificates/ca.pem
+  REQUESTS_CA_BUNDLE: /certificates/ca.pem
+
+x-certificate-volume: &certificate-volume
+  type: bind
+  source: ${CERT_FILE:?Set CERT_FILE to your host CA bundle path}
+  target: /certificates/ca.pem
+  read_only: true
+  bind:
+    create_host_path: false
+
+services:
+  runner:
+    environment: *certificate-environment
+    volumes:
+      - *certificate-volume
+  evaluate:
+    environment: *certificate-environment
+    volumes:
+      - *certificate-volume
+  ray:
+    environment: *certificate-environment
+    volumes:
+      - *certificate-volume

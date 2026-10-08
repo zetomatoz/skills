@@ -2,6 +2,11 @@
 
 Version: 1.0. GuideLLM: 0.8.0. Source: the supplied handwritten sketch.
 
+The following defaults describe the generated five-bucket workload and the bundled
+`assets/specs/mixed.json`. An explicitly supplied native JSON/YAML `--spec` owns its
+workload, model and tokenizer; environment bucket/stream variables do not change it.
+Runtime endpoint/key selection and CA trust use the generic settings in the README.
+
 ## Reading of the sketch
 
 UP means user prompt; MO means model output. Five paired size classes have request

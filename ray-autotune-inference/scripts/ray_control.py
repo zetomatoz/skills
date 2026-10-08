@@ -96,7 +96,8 @@ def run(args, env, api=None):
         raise Error("Recorded state is only accepted for offline plan.")
     endpoint = env.get("RAY_DASHBOARD_URL", "")
     if not args.state_file and api is None:
-        api = ray.RayAPI(endpoint, env.get("RAY_AUTH_TOKEN", ""))
+        api = ray.RayAPI(endpoint, env.get("RAY_AUTH_TOKEN", ""),
+                         env.get("CERT_FILE") or env.get("SSL_CERT_FILE", ""))
     if args.action == "status":
         state = api.request()
         # Full state can contain secrets: save privately, never dump to stdout.
@@ -165,7 +166,7 @@ def main():
     parser.add_argument("--timeout", type=float, default=900)
     args = parser.parse_args()
     try:
-        run(args, os.environ)
+        run(args, ray.config.trusted_environment(ray.config.load_environment()))
     except Error as exc:
         print(f"Ray operation failed: {exc}", file=sys.stderr)
         return 1

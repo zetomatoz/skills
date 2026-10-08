@@ -41,3 +41,31 @@ docker run --rm --user "$(id -u):$(id -g)" \
 The full-size scenario needs a supplied endpoint, API credentials when applicable,
 matching tokenizer, and correctly declared context limit. Real Ray tuning needs
 the operator's complete current Serve configuration and deployment identifiers.
+
+## Runtime/spec integration update, 2026-10-08
+
+- All 57 checks passed across the repository and four skill suites; 34 cover stress
+  testing, including target-specific auth, dotenv precedence, native spec preservation,
+  temporary secret-file cleanup, context budgets, and Compose certificate mapping.
+- Offline CLI plans succeeded for JSON smoke, YAML smoke, the paired mixed trace,
+  and the legacy generated workload using the example environment file.
+- GuideLLM 0.8.0's published wheel accepted all three bundled native examples and
+  the generated scenario. Validation used an isolated temporary Python environment.
+- The updated `tests/docker_smoke.py` passed in that native Python environment:
+  generated workload, JSON/proxy, and YAML/direct-backend runs each completed
+  20 requests at both 12 and 24 streams, with zero errors/incomplete requests.
+  The two native runs also completed separate warmups. Warmup retains a request
+  bound to prevent finite datasets stalling a duration-only warmup.
+- Synthetic proxy/backend/admin credentials were absent from saved scenario,
+  manifest, warmup, and raw report JSON files. Neither native run contacted its
+  configured dummy control-plane URL.
+- A local HTTPS fixture rejected an untrusted self-signed certificate and succeeded
+  with the explicit CA for the API probe, Ray REST transport and an httpx subprocess.
+  Compose validation confirmed a read-only host CA mount and container trust paths.
+- Bundle checks include the native examples, paired CSV and certificate Compose
+  override, while excluding private dotenv and certificate files.
+
+The Docker image re-pull was denied by the registry in this environment, so this
+update's full mock runs used the pinned Python package rather than repeating the
+container run. The earlier container evidence above is historical. No real-model
+benchmark, live deployment mutation or authenticated Copilot session was run.

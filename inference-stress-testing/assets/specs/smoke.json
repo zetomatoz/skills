@@ -1,0 +1,23 @@
+{
+  "backend": {
+    "kind": "openai_http",
+    "model": "your-served-model-name",
+    "request_format": "/v1/chat/completions",
+    "stream": true,
+    "verify": true,
+    "validate_backend": false
+  },
+  "tokenizer": {
+    "kind": "huggingface_auto",
+    "model": "your-org/your-matching-tokenizer"
+  },
+  "profile": { "kind": "concurrent", "streams": [1] },
+  "data": [ { "kind": "synthetic_text", "prompt_tokens": 128, "output_tokens": 32 } ],
+  "data_loader": { "kind": "pytorch", "samples": 20 },
+  "constraints": [
+    { "kind": "max_requests", "count": 20 },
+    { "kind": "max_duration", "seconds": 120 }
+  ],
+  "seed": { "kind": "static", "value": 42 },
+  "metrics": { "kind": "generative", "sample_size": 20 }
+}

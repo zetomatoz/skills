@@ -44,20 +44,25 @@ cd skills/inference-stress-testing
 cp .env.example .env
 ```
 
-Edit `.env`: set `AI_ENDPOINT`, `AI_MODEL`, `TOKENIZER`, and the model's actual
-`CONTEXT_TOKENS`. Add credentials if your endpoint or tokenizer requires them.
+Edit `.env`: select `BENCH_TARGET=proxy` or `inference_backend`, set its
+`ENDPOINT_PROXY` / `PROXY_API_KEY` or `ENDPOINT_INFERENCE_BACKEND` /
+`INFERENCE_BACKEND_API_KEY`, and declare the model's actual `CONTEXT_TOKENS`.
+Edit `assets/specs/smoke.json` with the served model name and matching tokenizer.
+Set `CERT_FILE` when a private CA is needed; the skill guide includes the mount.
 
 ```bash
 # Generate the workload and scenario without contacting the inference endpoint.
-docker compose run --rm runner plan
+docker compose run --rm runner plan --spec assets/specs/smoke.json --run-name first-test
 
 # Probe, warm up, benchmark, and evaluate the configured endpoint.
-docker compose run --rm runner run
+docker compose run --rm -e EVAL_MIN_COMPLETED_REQUESTS=20 runner run --spec assets/specs/smoke.json --run-name first-test
 ```
 
 Inspect the new directory under `artifacts/` for the manifest, reports, evaluation,
 and summary. The load generator needs no GPU; the inference server supplies the
-compute. The default workload includes long prompts, so check the
+compute. The small smoke starts at one stream and 20 requests. For the full mixed
+workload, use `assets/specs/mixed.json` with a minimum-completed gate of 100. It
+includes long prompts, so check the
 [test specification](inference-stress-testing/references/test-spec.md) before running.
 
 For thresholds, networking, TLS, and Ray tuning, read the
@@ -65,7 +70,10 @@ For thresholds, networking, TLS, and Ray tuning, read the
 
 ## Use with your agent
 
-Each skill has a `SKILL.md` entry point and its supporting files. For a Codex project,
+Each skill has a `SKILL.md` entry point and its supporting files. For Copilot in
+VS Code, copy the entire folder into `.github/skills/inference-stress-testing/`
+and use Copilot Chat in Agent mode. See [GitHub's skill instructions](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills).
+For a Codex project,
 copy the entire skill directory into your project's skill directory. Run this from
 the repository root, replacing the destination with your project path:
 
@@ -76,9 +84,9 @@ cp -R inference-stress-testing /path/to/your-project/.agents/skills/
 
 Example request:
 
-> Use the inference-stress-testing skill to benchmark my endpoint at 12 and 24
-> concurrent requests. Keep the same workload for both stages, report p95 time to
-> first token and output throughput, and identify any unconfigured evaluation gates.
+> Use inference-stress-testing with my native GuideLLM spec and existing .env.
+> Generate an offline plan first. Use my selected endpoint and certificate settings
+> without displaying credentials, and report any missing inputs or evaluation gates.
 
 For other agents, use their skill-loading mechanism or point them to the
 [skill instructions](inference-stress-testing/SKILL.md). The supporting tools can
@@ -86,8 +94,8 @@ also run standalone through Docker Compose.
 
 ## Validation you can inspect
 
-The first skill has 23 standard-library tests and a recorded container integration
-check using GuideLLM's mock server. That verifies the integration; it does not
+The first skill has 34 unit checks and recorded mock integration checks, including
+native JSON/YAML specs, runtime credentials and certificates. That verifies the integration; it does not
 establish real-model throughput, GPU capacity, or production readiness.
 
 Read the [validation record](inference-stress-testing/references/validation.md),

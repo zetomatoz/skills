@@ -1,0 +1,26 @@
+{
+  "metadata": { "labels": { "name": "mixed-prompt-output-12-24" } },
+  "spec": {
+    "backend": {
+      "kind": "openai_http",
+      "model": "your-served-model-name",
+      "request_format": "/v1/chat/completions",
+      "stream": true,
+      "verify": true,
+      "validate_backend": false,
+      "timeout": 120
+    },
+    "tokenizer": { "kind": "huggingface_auto", "model": "your-org/your-matching-tokenizer" },
+    "profile": { "kind": "concurrent", "streams": [12, 24] },
+    "data": [
+      { "kind": "trace_synthetic", "source": { "kind": "csv_file", "path": "../workloads/mixed.csv" } }
+    ],
+    "data_loader": { "kind": "pytorch", "samples": 200, "shuffle": false, "prefetch_factor": 32 },
+    "constraints": [
+      { "kind": "max_requests", "count": 200 },
+      { "kind": "max_duration", "seconds": 300 }
+    ],
+    "seed": { "kind": "static", "value": 42 },
+    "metrics": { "kind": "generative", "sample_size": 20 }
+  }
+}

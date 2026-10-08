@@ -10,7 +10,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILLS = ("inference-stress-testing", "ray-autotune-inference", "inference-observability", "inference-optimization")
-ALLOWED_ROOT = {"SKILL.md", "README.md", "compose.yaml", ".env.example", ".gitignore"}
+ALLOWED_ROOT = {"SKILL.md", "README.md", "compose.yaml", "compose.cert.yaml", ".env.example", ".gitignore"}
 ALLOWED_DIRS = {"scripts", "references", "tests", "agents"}
 ALLOWED_SUFFIXES = {".py", ".md", ".json", ".yaml"}
 
@@ -18,6 +18,10 @@ ALLOWED_SUFFIXES = {".py", ".md", ".json", ".yaml"}
 def included(relative):
     if len(relative.parts) == 1:
         return relative.name in ALLOWED_ROOT
+    if relative.parts[0] == "assets":
+        return (len(relative.parts) == 3 and not any(part.startswith(".") for part in relative.parts)
+                and ((relative.parts[1] == "specs" and relative.suffix in (".json", ".yaml", ".yml"))
+                     or (relative.parts[1] == "workloads" and relative.suffix == ".csv")))
     return (relative.parts[0] in ALLOWED_DIRS and relative.suffix in ALLOWED_SUFFIXES
             and not any(p.startswith(".") or p == "__pycache__" for p in relative.parts))
 

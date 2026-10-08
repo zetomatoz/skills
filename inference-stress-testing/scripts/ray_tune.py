@@ -8,6 +8,7 @@ Ray has no compare-and-swap PUT: use one configuration writer during an apply.
 
 import argparse
 import copy
+import importlib.util
 import json
 import math
 import os
@@ -17,6 +18,10 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+
+_config_spec = importlib.util.spec_from_file_location("ray_runtime_config", Path(__file__).with_name("runtime_config.py"))
+config = importlib.util.module_from_spec(_config_spec)
+_config_spec.loader.exec_module(config)
 
 
 class TuningError(Exception):
@@ -175,13 +180,14 @@ class NoRedirects(urllib.request.HTTPRedirectHandler):
 
 
 class RayAPI:
-    def __init__(self, endpoint, token=""):
+    def __init__(self, endpoint, token="", cert_file=""):
         parsed = urllib.parse.urlsplit(endpoint)
         if parsed.scheme not in ("http", "https") or not parsed.hostname or parsed.username or parsed.query or parsed.fragment:
             raise TuningError("RAY_DASHBOARD_URL must be an HTTP(S) base URL without credentials, query, or fragment.")
         self.url = endpoint.rstrip("/") + "/api/serve/applications/"
         self.headers = {"Accept": "application/json", "Content-Type": "application/json"}
-        self.opener = urllib.request.build_opener(NoRedirects())
+        self.opener = urllib.request.build_opener(NoRedirects(), urllib.request.HTTPSHandler(
+            context=config.tls_context({"CERT_FILE": cert_file})))
         if token:
             self.headers["Authorization"] = "Bearer " + token
 
@@ -253,7 +259,8 @@ def run(args, env, api=None):
     overrides = overrides_from_env(env)
     timeout = numeric_env(env, "RAY_READY_TIMEOUT_SECONDS", positive=True) or 900
     if not args.state_file and api is None:
-        api = RayAPI(env.get("RAY_DASHBOARD_URL", ""), env.get("RAY_AUTH_TOKEN", ""))
+        api = RayAPI(env.get("RAY_DASHBOARD_URL", ""), env.get("RAY_AUTH_TOKEN", ""),
+                     env.get("CERT_FILE") or env.get("SSL_CERT_FILE", ""))
     state = load_json(args.state_file) if args.state_file else api.request()
     proposal = build_proposal(source, state, env["RAY_APP_NAME"], env["RAY_DEPLOYMENT_NAME"], overrides)
     output = Path(args.output)
@@ -278,7 +285,7 @@ def main():
     parser.add_argument("--state-file", help="Recorded GET response for offline plan only")
     args = parser.parse_args()
     try:
-        run(args, os.environ)
+        run(args, config.trusted_environment(config.load_environment()))
     except (TuningError, OSError, ValueError, TypeError, KeyError) as exc:
         print(f"Ray tuning failed: {exc}" if isinstance(exc, TuningError)
               else "Ray tuning failed: invalid input or local filesystem error.", file=sys.stderr)

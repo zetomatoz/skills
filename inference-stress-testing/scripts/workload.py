@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import random
 from probe import endpoint
+from runtime_config import evaluation_settings
 
 
 def integers(env, name, default, length=None):
@@ -40,7 +41,7 @@ def describe(env):
                       "weight_percent": w, "trace_rows": count * w // 100}
                      for i, (p, o, w) in enumerate(zip(prompts, outputs, weights))],
             "mix_semantics": "Exact finite trace proportions; time limits, failures and scheduling can change the measured subset.",
-            "eval_settings": {k: v for k, v in env.items() if k.startswith("EVAL_") and k != "EVAL_IMAGE"}}
+            "eval_settings": evaluation_settings(env)}
 
 
 def build_scenario(env, output_dir):

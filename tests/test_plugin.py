@@ -27,6 +27,10 @@ class PluginTests(unittest.TestCase):
             self.assertEqual(manifest["skills"], "./skills/")
             self.assertEqual(manifest["commands"], "./commands/")
             self.assertEqual(manifest["agents"], "./agents/")
+            self.assertTrue((output / "skills/inference-stress-testing/compose.cert.yaml").is_file())
+            self.assertTrue((output / "skills/inference-stress-testing/assets/specs/smoke.json").is_file())
+            self.assertTrue((output / "skills/inference-stress-testing/assets/specs/smoke.yaml").is_file())
+            self.assertTrue((output / "skills/inference-stress-testing/assets/workloads/mixed.csv").is_file())
             self.assertNotIn("$schema", manifest)
             self.assertEqual(len(list((output / "agents").glob("*.agent.md"))), 5)
             for script in ("ray-autotune-inference/scripts/ray_control.py",
@@ -55,7 +59,8 @@ class PluginTests(unittest.TestCase):
 
     def test_runtime_and_private_files_excluded(self):
         for value in (".env", "serve.json", "artifacts/run.json", "scripts/__pycache__/ray.pyc",
-                      "references/.secret.json", ".git/config", "workload.csv"):
+                      "references/.secret.json", ".git/config", "workload.csv", "assets/certs/company.pem",
+                      "assets/specs/.private.json", "assets/local-settings.json"):
             self.assertFalse(builder.included(Path(value)), value)
         self.assertTrue(builder.included(Path(".env.example")))
         self.assertTrue(builder.included(Path("scripts/ray_tune.py")))

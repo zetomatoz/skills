@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Small API/correctness probe, deliberately separate from synthetic load."""
 import json
-import os
 import urllib.request
 from urllib.parse import urlsplit
+from runtime_config import inference_environment, trusted_environment, tls_context, load_environment
 
 
 def endpoint(env):
@@ -17,6 +17,7 @@ def endpoint(env):
 
 
 def probe(env):
+    env = trusted_environment(inference_environment(env))
     base = endpoint(env)
     model = env.get("AI_MODEL", "")
     if not model:
@@ -31,15 +32,32 @@ def probe(env):
     if not quality:
         cases = [("api_smoke", "Reply with READY.", None)]
     results = []
+    request_format = env.get("PROBE_REQUEST_FORMAT", "/v1/chat/completions")
+    route = env.get("PROBE_ROUTE", request_format)
+    context = tls_context(env)
     for name, prompt, expected in cases:
         body = {"model": model, "messages": [{"role": "user", "content": prompt}],
                 "max_tokens": 32, "temperature": 0, "stream": False}
-        request = urllib.request.Request(base + "/v1/chat/completions",
+        if request_format == "/v1/completions":
+            body.pop("messages")
+            body["prompt"] = prompt
+        elif request_format == "/v1/responses":
+            body.pop("messages")
+            body.pop("max_tokens")
+            body.update(input=prompt, max_output_tokens=32)
+        request = urllib.request.Request(base + route,
                                          data=json.dumps(body).encode(), headers=headers)
         try:
-            with urllib.request.urlopen(request, timeout=float(env.get("REQUEST_TIMEOUT_SECONDS", "120"))) as response:
+            with urllib.request.urlopen(request, timeout=float(env.get("REQUEST_TIMEOUT_SECONDS", "120")),
+                                        context=context) as response:
                 data = json.load(response)
-            text = data["choices"][0]["message"]["content"]
+            if request_format == "/v1/completions":
+                text = data["choices"][0]["text"]
+            elif request_format == "/v1/responses":
+                text = "".join(part.get("text", "") for item in data.get("output", [])
+                               for part in item.get("content", []) if part.get("type") == "output_text")
+            else:
+                text = data["choices"][0]["message"]["content"]
             passed = isinstance(text, str) and bool(text.strip()) and (expected is None or text.strip() == expected)
             results.append({"case": name, "status": "PASS" if passed else "FAIL",
                             "expected": expected, "actual": text})
@@ -52,6 +70,6 @@ def probe(env):
 
 
 if __name__ == "__main__":
-    result = probe(os.environ)
+    result = probe(load_environment())
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] == "PASS" else 2)

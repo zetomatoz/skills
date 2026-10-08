@@ -42,11 +42,11 @@ def query_url(base, expression, start, end, step):
         {"query": expression, "start": start, "end": end, "step": step})
 
 
-def fetch(url, token=""):
+def fetch(url, token="", context=None):
     headers = {"Accept": "application/json"}
     if token:
         headers["Authorization"] = "Bearer " + token
-    opener = urllib.request.build_opener(ray.NoRedirects())
+    opener = urllib.request.build_opener(ray.NoRedirects(), urllib.request.HTTPSHandler(context=context))
     request = urllib.request.Request(url, headers=headers, method="GET")
     with opener.open(request, timeout=30) as response:
         data = response.read(16 * 1024 * 1024 + 1)
@@ -99,7 +99,8 @@ def collect(args, env, api=None, fetcher=fetch):
     # Validate supplied endpoints before creating artifacts or making requests.
     urls = {key: query_url(base, expression, start, end, args.step) for key, expression in queries.items()}
     if api is None:
-        api = ray.RayAPI(env.get("RAY_DASHBOARD_URL", ""), env.get("RAY_AUTH_TOKEN", ""))
+        api = ray.RayAPI(env.get("RAY_DASHBOARD_URL", ""), env.get("RAY_AUTH_TOKEN", ""),
+                         env.get("CERT_FILE") or env.get("SSL_CERT_FILE", ""))
     output = Path(args.output)
     output.mkdir(parents=True, mode=0o700, exist_ok=False)
     os.chmod(output, 0o700)
@@ -115,7 +116,10 @@ def collect(args, env, api=None, fetcher=fetch):
         manifest["ray_snapshot"] = "ERROR"
     for key, url in urls.items():
         try:
-            response = fetcher(url, env.get("PROMETHEUS_AUTH_TOKEN", ""))
+            if fetcher is fetch:
+                response = fetcher(url, env.get("PROMETHEUS_AUTH_TOKEN", ""), context=ray.config.tls_context(env))
+            else:
+                response = fetcher(url, env.get("PROMETHEUS_AUTH_TOKEN", ""))
             ray.private_json(output / (key + ".json"), response)
             manifest["metrics"][key] = {"status": availability(response), "expression": queries[key],
                                         "artifact": key + ".json"}
@@ -134,7 +138,7 @@ def main():
     parser.add_argument("--output", required=True, help="New private artifact directory")
     args = parser.parse_args()
     try:
-        manifest = collect(args, os.environ)
+        manifest = collect(args, ray.config.trusted_environment(ray.config.load_environment()))
     except (ValueError, TypeError, OSError, ray.TuningError):
         print("Collection failed; check URLs, window, query IDs and fresh output directory.", file=sys.stderr)
         return 1
