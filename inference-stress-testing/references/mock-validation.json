@@ -1,0 +1,246 @@
+{
+  "status": "PASS",
+  "report_schema": "guidellm-0.8/schema-v2",
+  "errors": [],
+  "benchmarks": [
+    {
+      "index": 0,
+      "status": "PASS",
+      "errors": [],
+      "metrics": {
+        "p95_ttft_ms": 8.158206939697266,
+        "p95_itl_ms": 1.1847359793526786,
+        "p95_e2e_ms": 32.72700309753418,
+        "output_tps": 4431.606573335668,
+        "error_rate": 0.0,
+        "completed_requests": 20
+      },
+      "gates": {
+        "p95_ttft_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 8.158206939697266,
+          "threshold": null
+        },
+        "p95_itl_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 1.1847359793526786,
+          "threshold": null
+        },
+        "p95_e2e_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 32.72700309753418,
+          "threshold": null
+        },
+        "output_tps": {
+          "status": "NOT_CONFIGURED",
+          "observed": 4431.606573335668,
+          "threshold": null
+        },
+        "error_rate": {
+          "status": "PASS",
+          "observed": 0.0,
+          "threshold": 0.0,
+          "comparison": "<="
+        },
+        "completed_requests": {
+          "status": "PASS",
+          "observed": 20,
+          "threshold": 20.0,
+          "comparison": ">="
+        },
+        "metric_integrity": {
+          "status": "PASS"
+        }
+      },
+      "request_totals": {
+        "successful": 20,
+        "errored": 0,
+        "incomplete": 0,
+        "total": 20
+      },
+      "output_length_audit": {
+        "status": "AVAILABLE",
+        "successful_request_samples": 20,
+        "samples_with_reported_usage": 20,
+        "samples_with_only_stream_iteration_estimates": 0,
+        "samples_with_unknown_usage": 0,
+        "by_requested_output_cap": [
+          {
+            "requested_output_cap_tokens": 8,
+            "samples": 3,
+            "reported_output_tokens_sum": 24,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 3,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 8.0
+          },
+          {
+            "requested_output_cap_tokens": 12,
+            "samples": 3,
+            "reported_output_tokens_sum": 36,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 3,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 12.0
+          },
+          {
+            "requested_output_cap_tokens": 16,
+            "samples": 6,
+            "reported_output_tokens_sum": 96,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 6,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 16.0
+          },
+          {
+            "requested_output_cap_tokens": 24,
+            "samples": 7,
+            "reported_output_tokens_sum": 168,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 7,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 24.0
+          },
+          {
+            "requested_output_cap_tokens": 32,
+            "samples": 1,
+            "reported_output_tokens_sum": 32,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 1,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 32.0
+          }
+        ],
+        "notes": [
+          "Requested output tokens are caps; actual generation may stop earlier.",
+          "GuideLLM 0.8 does not preserve finish_reason: reaching the cap indicates possible truncation, not proof.",
+          "Retained request samples may include warmup/cooldown and differ from the measured request totals.",
+          "Missing server usage can make GuideLLM token metrics depend on stream-iteration estimates."
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "status": "PASS",
+      "errors": [],
+      "metrics": {
+        "p95_ttft_ms": 8.94784927368164,
+        "p95_itl_ms": 1.501278443769975,
+        "p95_e2e_ms": 34.6980094909668,
+        "output_tps": 5806.235730089786,
+        "error_rate": 0.0,
+        "completed_requests": 20
+      },
+      "gates": {
+        "p95_ttft_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 8.94784927368164,
+          "threshold": null
+        },
+        "p95_itl_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 1.501278443769975,
+          "threshold": null
+        },
+        "p95_e2e_ms": {
+          "status": "NOT_CONFIGURED",
+          "observed": 34.6980094909668,
+          "threshold": null
+        },
+        "output_tps": {
+          "status": "NOT_CONFIGURED",
+          "observed": 5806.235730089786,
+          "threshold": null
+        },
+        "error_rate": {
+          "status": "PASS",
+          "observed": 0.0,
+          "threshold": 0.0,
+          "comparison": "<="
+        },
+        "completed_requests": {
+          "status": "PASS",
+          "observed": 20,
+          "threshold": 20.0,
+          "comparison": ">="
+        },
+        "metric_integrity": {
+          "status": "PASS"
+        }
+      },
+      "request_totals": {
+        "successful": 20,
+        "errored": 0,
+        "incomplete": 0,
+        "total": 20
+      },
+      "output_length_audit": {
+        "status": "AVAILABLE",
+        "successful_request_samples": 20,
+        "samples_with_reported_usage": 20,
+        "samples_with_only_stream_iteration_estimates": 0,
+        "samples_with_unknown_usage": 0,
+        "by_requested_output_cap": [
+          {
+            "requested_output_cap_tokens": 8,
+            "samples": 3,
+            "reported_output_tokens_sum": 24,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 3,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 8.0
+          },
+          {
+            "requested_output_cap_tokens": 12,
+            "samples": 3,
+            "reported_output_tokens_sum": 36,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 3,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 12.0
+          },
+          {
+            "requested_output_cap_tokens": 16,
+            "samples": 6,
+            "reported_output_tokens_sum": 96,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 6,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 16.0
+          },
+          {
+            "requested_output_cap_tokens": 24,
+            "samples": 7,
+            "reported_output_tokens_sum": 168,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 7,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 24.0
+          },
+          {
+            "requested_output_cap_tokens": 32,
+            "samples": 1,
+            "reported_output_tokens_sum": 32,
+            "below_cap": 0,
+            "at_cap_possible_truncation": 1,
+            "above_cap": 0,
+            "reported_output_tokens_mean": 32.0
+          }
+        ],
+        "notes": [
+          "Requested output tokens are caps; actual generation may stop earlier.",
+          "GuideLLM 0.8 does not preserve finish_reason: reaching the cap indicates possible truncation, not proof.",
+          "Retained request samples may include warmup/cooldown and differ from the measured request totals.",
+          "Missing server usage can make GuideLLM token metrics depend on stream-iteration estimates."
+        ]
+      }
+    }
+  ],
+  "semantics": {
+    "error_rate": "(errored + incomplete) / measured total",
+    "output_tps": "successful aggregate output tokens per second (GuideLLM rate mean)",
+    "latencies": "successful requests; TTFT and ITL ms, E2E converted seconds to ms",
+    "itl": "GuideLLM token-weighted per-request average inter-token latency distribution",
+    "quality": "not evaluated by this script"
+  }
+}
