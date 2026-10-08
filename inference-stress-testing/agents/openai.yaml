@@ -1,0 +1,4 @@
+interface:
+  display_name: "Inference Stress Testing"
+  short_description: "Benchmark streaming inference with fixed profiles"
+  default_prompt: "Use $inference-stress-testing to benchmark my OpenAI-compatible inference endpoint with reproducible profiles."

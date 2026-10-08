@@ -1,0 +1,5 @@
+{
+  "name": "inference-engineering",
+  "version": "0.1.1",
+  "description": "Benchmark, observe and tune Ray-managed inference through independent skills or a bounded optimization workflow."
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ray Autotune Inference"
+  short_description: "Measure scoped Ray and engine knob experiments"
+  default_prompt: "Use $ray-autotune-inference to plan a measured knob experiment for my existing Ray Serve deployment."

@@ -45,8 +45,13 @@ def check(root, external=False):
         links.extend(re.findall(r'<(https?://[^>]+)>', prose))
         # Inline static paths and paths in runnable snippets use the skill directory.
         base = path.parent
-        if 'inference-stress-testing' in path.relative_to(root).parts:
-            base = root / 'inference-stress-testing'
+        # Runnable snippets resolve relative to their containing skill directory.
+        for parent in (path.parent, *path.parents):
+            if parent == root:
+                break
+            if (parent / 'SKILL.md').is_file():
+                base = parent
+                break
         static = re.findall(r'(?<![\w/])(?:references|scripts|tests)/[\w./-]+\.(?:md|py|json)\b', source)
         static.extend(re.findall(r'`(README\.md|\.env\.example|compose\.yaml)`', source))
         for reference in set(static):

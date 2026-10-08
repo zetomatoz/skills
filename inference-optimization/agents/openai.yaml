@@ -1,0 +1,4 @@
+interface:
+  display_name: "Inference Optimization"
+  short_description: "Coordinate a bounded stress-observe-tune loop"
+  default_prompt: "Use $inference-optimization to optimize my Ray inference system across fixed test profiles with a finite budget."

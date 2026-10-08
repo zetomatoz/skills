@@ -1,0 +1,4 @@
+interface:
+  display_name: "Inference Observability"
+  short_description: "Correlate Ray health, logs and inference metrics"
+  default_prompt: "Use $inference-observability to review my Ray inference system during this benchmark window."

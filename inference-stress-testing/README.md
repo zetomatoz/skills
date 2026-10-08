@@ -1,7 +1,7 @@
 # Inference Engineering - Agent skills
 
-Docker runner and reusable agent skills for the supplied sketch, pinned to GuideLLM
-0.8.0. Synthetic paired workloads: **15/15/30/35/5%**, tested at **12 and 24 streams**.
+Docker runner and reusable agent skill for inference endpoint benchmarks, pinned to
+GuideLLM 0.8.0. Synthetic paired workloads: **15/15/30/35/5%**, tested at **12 and 24 streams**.
 See [the complete test spec](references/test-spec.md) for assumptions and limits.
 
 ## Run
@@ -99,6 +99,3 @@ python -m unittest discover -s tests -v
 ```
 
 See [verification evidence](references/validation.md) and [sources](references/sources.md).
-
-Publication drafts for review: [tweet thread](editorial/tweet-thread.md) and
-[Substack article](editorial/substack-draft.md). Nothing has been published.

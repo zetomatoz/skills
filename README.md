@@ -1,40 +1,37 @@
 # Inference Engineering Skills
 
-**Practical agent skills for benchmarking, operating, and improving LLM inference.**
-
-A growing collection of runnable workflows for **Ray, GuideLLM, vLLM, and the
-inference stack around them**. Give your coding agent a repeatable procedure,
-run the supporting tools yourself, and keep the evidence needed to understand
-what changed.
-
-The goal: make inference engineering easier to reproduce, review, and share—from
-a first load test to a carefully measured serving configuration change.
-
-[Explore the first skill](inference-stress-testing/README.md) ·
-[Request a skill](https://github.com/zetomatoz/skills/issues) ·
-[Contribute](#contribute)
+Runnable agent skills for benchmarking inference endpoints, collecting serving
+metrics, tuning existing Ray Serve deployments, and comparing bounded experiments.
+Each skill includes instructions, supporting tools, and validation records.
 
 ## Skill directory
 
 | Skill | What you can do today | Tools |
 |---|---|---|
 | [Inference stress testing](inference-stress-testing/README.md) | Generate paired prompt/output workloads, benchmark a streaming endpoint at 12 and 24 concurrent requests, evaluate results, and optionally tune an existing Ray Serve deployment. | GuideLLM 0.8.0, Docker Compose, Ray Serve REST API |
+| [Ray autotune inference](ray-autotune-inference/README.md) | Inspect an existing deployment, run bounded knob experiments, verify health and rollback, and delegate endpoint measurements to inference-stress-testing. | Ray Serve, deployed inference engine, inference-stress-testing |
+| [Inference observability](inference-observability/README.md) | Collect Ray state and windowed metrics, review logs and Grafana panels, and report bottlenecks and evidence gaps. | Python, Ray REST API, optional Prometheus/Grafana |
+| [Inference optimization](inference-optimization/README.md) | Coordinate the stress-observe-tune-evaluate loop across fixed profiles with rollback, trial budgets and stopping rules. | All three skills, Python comparison tool |
 
-**Current scope:** one runnable skill. It targets OpenAI-compatible inference
-endpoints, including compatible vLLM deployments. Dedicated vLLM deployment and
-optimization skills are planned; they are not included yet.
+**Current scope:** four independently callable skills and a buildable plugin that
+bundles all dependencies, command aliases and focused agent specs. Ray is the first
+control-plane backend. Observation and optimization are agent-guided workflows
+supported by Python tools; logs/panels and live optimization are not yet validated.
+Dedicated NVIDIA Dynamo and vLLM deployment adapters are not included.
 
-## Why use these skills?
+## One plugin, individual skills or the full workflow
 
-- **Runnable procedures.** Each skill pairs agent instructions with scripts,
-  configuration, and a guide you can use directly.
-- **Reproducible experiments.** Preserve workloads, seeds, versions, and thresholds
-  so configuration comparisons have a useful baseline.
-- **Inspectable results.** The current benchmark saves workload manifests,
-  JSON/CSV/HTML reports, and evaluation summaries.
-- **Clear evidence.** Validation records distinguish local tests, mock integration
-  checks, and measurements against real models. Unconfigured performance gates
-  remain explicit.
+Build a self-contained [Inference Engineering plugin](plugins/inference-engineering/README.md):
+
+```bash
+python3 scripts/build_plugin.py --output dist/copilot/inference-engineering --zip
+```
+
+Choose stress-test, observe or tune independently, or invoke inference-optimization
+to run a bounded experiment. GitHub Copilot CLI is the first supported harness, with native commands and
+`.agent.md` definitions. The same procedures remain available as skills for Codex. No deployment or
+load test starts on installation. See the plugin guide for host-specific loading,
+private runtime workspaces, evidence limits and the backend extension contract.
 
 ## Quick start
 
@@ -98,22 +95,9 @@ Read the [validation record](inference-stress-testing/references/validation.md),
 [upstream sources](inference-stress-testing/references/sources.md) for the evidence
 and assumptions behind the workflow.
 
-## Where this collection is heading
-
-Contributions and requests are welcome in these areas. These are roadmap ideas,
-not shipped features:
-
-| Area | Useful skills to build |
-|---|---|
-| Ray Serve | Deployment diagnosis, replica sizing, autoscaling experiments, and configuration comparisons. |
-| GuideLLM | Workload design, concurrency sweeps, latency/throughput analysis, and repeatable benchmark reports. |
-| vLLM | Serving setup, memory and KV-cache diagnosis, batching, parallelism, and prefix-cache experiments. |
-| Inference operations | Endpoint probes, capacity planning, observability, regression detection, and cost/performance comparisons. |
-
 ## Contribute
 
-Help make this a useful public reference for inference engineers and the agents
-they work with:
+Contributions should include runnable workflows and evidence of their behavior:
 
 - **Request a workflow:** [open an issue](https://github.com/zetomatoz/skills/issues)
   with the task, stack and versions, desired outcome, and how you would verify it.
@@ -126,10 +110,7 @@ they work with:
   cache policy, and measurement limits. Remove credentials and private request data.
 
 Keep each skill in its own directory so users can install it independently. Prefer
-focused workflows with clear inputs and outputs. Small, well-verified contributions
-are welcome.
-
-If this collection helps your work, star it and share a workflow you want to see next.
+focused workflows with clear inputs and outputs.
 
 ## Repository checks
 
@@ -140,6 +121,9 @@ python3 scripts/check_links.py
 python3 scripts/check_links.py --external
 python3 -m unittest discover -s tests -v
 python3 -m unittest discover -s inference-stress-testing/tests -v
+python3 -m unittest discover -s ray-autotune-inference/tests -v
+python3 -m unittest discover -s inference-observability/tests -v
+python3 -m unittest discover -s inference-optimization/tests -v
 ```
 
 GitHub Actions checks documentation links and static file references on pushes and
